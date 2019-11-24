@@ -112,10 +112,10 @@ def get_neighborhood(solution, dict_of_neighbours, n_opt=1):
     return neighborhood_of_solution
 
 
-def tabu_search(first_solution, distance_of_first_solution, dict_of_neighbours, iters, size, n_opt=1):
+def tabu_search(first_solution, cost_of_first_solution, dict_of_neighbours, iters, size, n_opt=1):
     count = 1
     best_solution_ever = first_solution
-    best_cost = distance_of_first_solution
+    best_cost = cost_of_first_solution
     tabu_list = list()
     while count <= iters:
         neighborhood = get_neighborhood(solution, dict_of_neighbours, n_opt=n_opt)
