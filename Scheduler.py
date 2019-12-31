@@ -1,56 +1,58 @@
 from Assumptions import Assumptions
 from copy import deepcopy
+from Worker import Worker
 
 
 class Scheduler:
     def __init__(self):
-        self.workers = list()
-        self.schedule = self.random_schedule()
-        self.neighbours = self.get_neighbours()
+        self.workers = None
+        self.default_workers()
 
-    def random_schedule(self):
-        schedule = [[0 for i in Assumptions.n_days * 3] for j in Assumptions.n_workers]
-        # TODO Generate random schedule
-        return schedule
+    def __str__(self):
+        string = ""
+        for worker in self.workers:
+            string += str(worker)
+        return string
+
+    def __eq__(self, other):
+        if len(self.workers) == len(other.workers):
+            for i in range(len(self.workers)):
+                for j in range(len(self.workers[i].schedule)):
+                    if self.workers[i].schedule[j] != other.workers[i].schedule[j]:
+                        return False
+            return True
+        else:
+            return False
+
+    def default_workers(self):
+        self.workers = [Worker() for i in range(Assumptions.n_workers)]
+        shifts_assigned = 0
+        n_workers_available = Assumptions.n_workers
+        for week in range(Assumptions.n_weeks):
+            for i in range(len(Assumptions.n_required_shifts)):
+                j = Assumptions.n_required_shifts[i]
+                while j > 0:
+                    self.workers[shifts_assigned % n_workers_available].schedule[week*3*7 + i] = True
+                    shifts_assigned += 1
+                    j -= 1
 
     def get_total_cost(self) -> int:
-        return sum([worker.cost for worker in self.workers])
-
-    def swap_shifts(self, col, row1, row2):
-        self.schedule[row1][col], self.schedule[row2][col] = self.schedule[row2][col], self.schedule[row1][col]
-        return self
+        return sum([worker.cost for worker in self.workers if worker.is_working()])
 
     def swap_workers(self, w1, w2):
-        self.schedule[w1], self.schedule[w2] = self.schedule[w2], self.schedule[w1]
-        return self
+        self.workers[w1].schedule, self.workers[w2].schedule = self.workers[w2].schedule, self.workers[w1].schedule
 
-    def is_same_position(self, w1, w2) -> bool:
-        return self.workers[w1].current_position == self.workers[w2].current_position
+    def swap_shifts(self, w1, w2, shift):
+        self.workers[w1].schedule[shift], self.workers[w2].schedule[shift] = self.workers[w2].schedule[shift], self.workers[w1].schedule[shift]
 
     def get_neighbours(self):
-        neighbours = list()
-        rows = range(len(self.workers))
-        cols = range(len(self.workers[0]))
-        # Swapping shifts
-        for worker_i in rows:
-            for shift_i in cols:
-                if self.schedule[worker_i][shift_i] == 1:
-                    for compared_worker_i in rows:
-                        if self.schedule[compared_worker_i][shift_i] == 0 and self.is_same_position(worker_i, compared_worker_i):
-                            neighbour = deepcopy(self).swap_shifts(shift_i, worker_i, compared_worker_i)
-                            if neighbour not in neighbours:
-                                neighbours.append(neighbour)
-        # Swapping workers within same position
-        for worker1_i in rows:
-            for worker2_i in rows:
-                neighbour = deepcopy(self).swap_workers(worker1_i, worker2_i)
-                if neighbour not in neighbours and self.is_same_position(worker1_i, worker2_i):
-                    neighbours.append(neighbour)
-        # Swapping positions
-
+        neighbours = set()
+        neighbour = deepcopy(self)
+        neighbours.add(neighbour)
         return neighbours
 
 
-
-
-
+scheduler = Scheduler()
+scheduler2 = Scheduler()
+scheduler2.swap_workers(0, 5)
+print(scheduler == scheduler2)

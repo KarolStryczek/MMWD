@@ -1,5 +1,5 @@
 
 class Assumptions:
-    n_workers = 30
-    n_shifts4skill = [3, 1]
-    n_days = 20
+    n_workers = 6
+    n_required_shifts = [3, 2, 2, 3, 2, 2, 3, 2, 2, 3, 2, 2, 3, 2, 2, 3, 2, 2, 3, 2, 2]  # Whole week
+    n_weeks = 1
