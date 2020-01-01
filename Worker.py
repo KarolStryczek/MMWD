@@ -1,24 +1,13 @@
 from Assumptions import Assumptions
 
 
-# __init__ with some defaults
-# Defaults
-default_cost = 2000
-default_acceptable_shifts = (True for i in range(21))
-default_schedule = [False for shift in range(Assumptions.n_weeks * 7 * 3)]
-
-
 class Worker:
-    # TODO below?
-    # Values below will be used in generating random Worker
-    # max_cost = 10000
-    # min_cost = 2000
-    # min_acceptable_shifts = 12
 
     # __init__ with some defaults
     # Defaults
     default_cost = 2000
-    default_acceptable_shifts = [True for i in range(21)]
+    default_acceptable_shifts = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    max_unaccepted_shifts = 2
 
     def __init__(self, cost=default_cost, acceptable_shifts=default_acceptable_shifts):
         self.cost = cost
@@ -31,10 +20,33 @@ class Worker:
             string += 'X' if shift else '_'
         return string + '\n'
 
+    def __hash__(self):
+        return hash(tuple(self.schedule))
+
     def is_working(self):
         for shift in self.schedule:
             if shift:
                 return True
         return False
 
+    def is_allowed(self):
+        for i in range(len(self.schedule)-2):
+            if self.schedule[i]:
+                if self.schedule[i+1] or self.schedule[i+2]:
+                    return False
+        if self.schedule[-1] and self.schedule[-2]:
+            return False
+        return True
 
+    def count_unaccepted_shifts(self):
+        unaccepted_shifts = 0
+        for i in range(len(self.schedule)):
+            if self.schedule[i] and not self.acceptable_shifts[i % 21]:
+                unaccepted_shifts += 1
+        return unaccepted_shifts
+
+    def is_acceptable(self):
+        return self.count_unaccepted_shifts() == 0
+
+    def is_pretending_to_be_acceptable(self):
+        return self.count_unaccepted_shifts() < self.max_unaccepted_shifts

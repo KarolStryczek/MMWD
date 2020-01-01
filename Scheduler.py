@@ -24,6 +24,9 @@ class Scheduler:
         else:
             return False
 
+    def __hash__(self):
+        return hash(tuple(self.workers))
+
     def default_workers(self):
         self.workers = [Worker() for i in range(Assumptions.n_workers)]
         shifts_assigned = 0
@@ -47,12 +50,34 @@ class Scheduler:
 
     def get_neighbours(self):
         neighbours = set()
-        neighbour = deepcopy(self)
-        neighbours.add(neighbour)
+        # Swapping workers
+        for i in range(len(self.workers)):
+            for j in range(i+1, len(self.workers)):
+                neighbour = deepcopy(self)
+                neighbour.swap_workers(i, j)
+                neighbours.add(neighbour)
+        # Swapping shifts
+        for i in range(len(self.workers)):
+            for j in range(len(self.workers[i].schedule)):
+                if self.workers[i].schedule[j]:
+                    for k in range(len(self.workers)):
+                        neighbour = deepcopy(self)
+                        neighbour.swap_shifts(i, k, j)
+                        neighbours.add(neighbour)
         return neighbours
 
+    def get_sorted_neighbourhood(self):
+        neighbours = list(self.get_neighbours())
+        neighbours.sort(key=lambda neighbour : neighbour.get_total_cost())
+        return neighbours
 
-scheduler = Scheduler()
-scheduler2 = Scheduler()
-scheduler2.swap_workers(0, 5)
-print(scheduler == scheduler2)
+    def is_allowed(self):
+        return sum([worker.is_allowed() for worker in self.workers]) == len(self.workers)
+
+
+# scheduler = Scheduler()
+# scheduler.workers.append(Worker(cost=3000))
+# neighbourhood = scheduler.get_sorted_neighbourhood()
+# print(neighbourhood[0].get_total_cost(), neighbourhood[-1].get_total_cost())
+# print(scheduler)
+
