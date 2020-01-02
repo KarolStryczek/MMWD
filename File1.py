@@ -12,6 +12,7 @@ import math
 
 from Scheduler import Scheduler
 from Worker import Worker
+import CustomeWorkers
 
 
 def distance(point1, point2):
@@ -183,7 +184,7 @@ def my_tabu_search(first_solution, iters, tabu_list_size=30):
 
 if __name__ == '__main__':
     # tabu_search(generate_first_solution( , generate_neighbours()), , generate_neighbours(), , )
-    first_solution = Scheduler()
+    first_solution = Scheduler(CustomeWorkers.randomized_workers())
     best = my_tabu_search(first_solution, 30, 100)
     print(first_solution.get_total_cost(), best.get_total_cost())
     print(best)
