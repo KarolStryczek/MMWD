@@ -2,14 +2,7 @@ from Assumptions import Assumptions
 
 
 class Worker:
-
-    # __init__ with some defaults
-    # Defaults
-    default_cost = 2000
-    default_acceptable_shifts = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-    max_unaccepted_shifts = 2
-
-    def __init__(self, cost=default_cost, acceptable_shifts=default_acceptable_shifts):
+    def __init__(self, cost, acceptable_shifts):
         self.cost = cost
         self.acceptable_shifts = acceptable_shifts
         self.schedule = [False for shift in range(Assumptions.n_weeks * 7 * 3)]
@@ -49,4 +42,4 @@ class Worker:
         return self.count_unaccepted_shifts() == 0
 
     def is_pretending_to_be_acceptable(self):
-        return self.count_unaccepted_shifts() < self.max_unaccepted_shifts
+        return self.count_unaccepted_shifts() < Assumptions.max_unaccepted_shifts

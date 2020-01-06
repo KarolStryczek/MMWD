@@ -163,6 +163,7 @@ def tabu_search(first_solution, cost_of_first_solution, dict_of_neighbours, iter
     return best_solution_ever, best_cost
 
 
+# TODO We need to optimize this. Maybe be should decrease neighbours amount?
 def my_tabu_search(first_solution, iters, tabu_list_size=30):
     best = first_solution
     best_candidate = first_solution
@@ -179,6 +180,8 @@ def my_tabu_search(first_solution, iters, tabu_list_size=30):
         tabu_list.append(best_candidate)
         if len(tabu_list) > tabu_list_size:
             del tabu_list[0]
+        if i%10 == 0:
+            print(best)
     return best
 
 
@@ -188,4 +191,3 @@ if __name__ == '__main__':
     best = my_tabu_search(first_solution, 30, 100)
     print(first_solution.get_total_cost(), best.get_total_cost())
     print(best)
-

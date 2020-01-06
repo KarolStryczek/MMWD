@@ -32,7 +32,8 @@ class Scheduler:
         return hash(tuple(self.workers))
 
     def default_workers(self):
-        self.workers = [Worker() for i in range(Assumptions.n_workers)]
+        acceptable_shifts = Assumptions.default_acceptable_shifts
+        self.workers = [Worker(Assumptions.starting_cost + i*Assumptions.cost_increase, acceptable_shifts) for i in range(Assumptions.n_workers)]
         shifts_assigned = 0
         n_workers_available = Assumptions.n_workers
         for week in range(Assumptions.n_weeks):
@@ -113,8 +114,6 @@ class Scheduler:
 
 
 # scheduler = Scheduler()
-# scheduler.workers.append(Worker(cost=3000))
-# neighbourhood = scheduler.get_sorted_neighbourhood()
-# print(neighbourhood[0].get_total_cost(), neighbourhood[-1].get_total_cost())
-# print(scheduler)
-
+# scheduler.workers.append(Worker(3000, Assumptions.default_acceptable_shifts))
+# for worker in scheduler.workers:
+#     print(worker.cost)
