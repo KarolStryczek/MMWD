@@ -11,7 +11,7 @@ class Worker:
         string = ""
         for shift in self.schedule:
             string += 'X' if shift else '_'
-        return string + '\n'
+        return string + " " + str(self.cost) + '\n'
 
     def __hash__(self):
         return hash(tuple(self.schedule))

@@ -9,7 +9,7 @@ def randomized_workers():
     seed(1)
     for i in range(Assumptions.n_workers):
         # generate random Gaussian value
-        cost = round(gauss(3000, 500), 2)
+        cost = round(gauss(3000, 500))
         acceptable_shifts = []
         for i in range(len(Assumptions.n_required_shifts)):
             acceptable_shifts.append(int(true_for_random_percentage(90)))
