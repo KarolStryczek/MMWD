@@ -9,12 +9,29 @@ class Worker:
 
     def __str__(self):
         string = ""
-        for shift in self.schedule:
-            string += 'X' if shift else '_'
-        return string + " " + str(self.cost) + '\n'
+        for i in range(len(self.schedule)):
+            if i % 21 == 0:
+                string += '|'
+            if self.schedule[i]:
+                string += 'V' if self.acceptable_shifts[i % 21] else 'X'
+            else:
+                string += '_' if self.acceptable_shifts[i % 21] else ' '
+        return string + " " + str(self.get_cost()) + " " + str(self.how_bad_am_i()) + '\n'
 
     def __hash__(self):
         return hash(tuple(self.schedule))
+
+    def get_cost(self):
+        return self.cost
+
+    def how_bad_am_i(self):
+        badness = 0
+        for i in range(len(self.schedule)):
+            if self.schedule[i] and not self.acceptable_shifts[i % 21]:
+                badness += 1
+            if sum(self.schedule[max(i-21, 0):i]) > 3:
+                badness += 5
+        return badness
 
     def is_working(self):
         for shift in self.schedule:
@@ -43,3 +60,10 @@ class Worker:
 
     def is_pretending_to_be_acceptable(self):
         return self.count_unaccepted_shifts() < Assumptions.max_unaccepted_shifts
+
+
+# acc = (1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0)
+# sch = (1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0)
+# w1 = Worker(2000, acc)
+# w1.schedule = sch
+# print(w1.how_bad_am_i())

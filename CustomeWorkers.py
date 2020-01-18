@@ -12,7 +12,7 @@ def randomized_workers():
         cost = round(gauss(3000, 500))
         acceptable_shifts = []
         for i in range(len(Assumptions.n_required_shifts)):
-            acceptable_shifts.append(int(true_for_random_percentage(90)))
+            acceptable_shifts.append(int(true_for_random_percentage(50)))
         workers.append(Worker(cost, acceptable_shifts))
     return workers
 
