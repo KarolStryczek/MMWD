@@ -28,8 +28,8 @@ def get_workers(mode: str) -> List[Worker]:
                 acceptable_shifts.append(int(true_for_random_percentage(Assumptions.percent_acceptable_shifts)))
             workers.append(Worker(cost, acceptable_shifts))
         return workers
-    elif mode == "random":
-        pass
+    else:
+        raise NotImplementedError
 
 
 def true_for_random_percentage(percent=50):

@@ -87,12 +87,13 @@ class Scheduler:
                 neighbour.swap_workers(i, j)
                 neighbours.add(neighbour)
         # Swapping shifts
-        for j in range(0, len(self.workers[0].schedule)):
-            if self.workers[i].schedule[j]:
-                for k in range(len(self.workers)):
-                    neighbour = deepcopy(self)
-                    neighbour.swap_shifts(i, k, j)
-                    neighbours.add(neighbour)
+        for k in range(len(self.workers)):
+            if self.workers[k].is_working():
+                for j in range(0, len(self.workers[0].schedule)):
+                    if self.workers[i].schedule[j]:
+                        neighbour = deepcopy(self)
+                        neighbour.swap_shifts(i, k, j)
+                        neighbours.add(neighbour)
         for k in range(len(self.workers)):
             neighbour = deepcopy(self)
             neighbour.collapse_workers(i, k)

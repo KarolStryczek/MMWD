@@ -3,6 +3,8 @@ import WorkersFactory
 import Assumptions
 from matplotlib import pyplot as plt
 import time
+import psutil
+import os
 
 
 def my_tabu_search(first_solution, iters, tabu_list_size=30):
@@ -11,7 +13,7 @@ def my_tabu_search(first_solution, iters, tabu_list_size=30):
     best_candidate = first_solution
     tabu_list = list()
     tabu_list.append(first_solution)
-    stats = [list(), list(), list()]  # [i, cost, badness]
+    stats = [list(), list(), list(), list()]  # [i, cost, badness, memory]
     for i in range(iters):
         if i % 10 == 0:
             print(best)
@@ -36,18 +38,18 @@ def my_tabu_search(first_solution, iters, tabu_list_size=30):
         stats[0].append(i)
         stats[1].append(best.get_total_cost())
         stats[2].append(best.how_bad_am_i())
+        stats[3].append(process.memory_info().rss)
     return best, best_good, stats
 
 
 if __name__ == '__main__':
     # Algorithm
-    first_solution = Scheduler(WorkersFactory.get_workers("equal"))
+    first_solution = Scheduler(WorkersFactory.get_workers(Assumptions.workers_type))
     start = time.time()
+    process = psutil.Process(os.getpid())
     best_solution, best_good, statistics = my_tabu_search(first_solution, Assumptions.n_iters, Assumptions.tabu_size)
     end = time.time()
     time_elapsed = end - start
-
-    print(time_elapsed)
 
     # Display
     print(first_solution.get_total_cost(), best_solution.get_total_cost())
@@ -62,3 +64,10 @@ if __name__ == '__main__':
     plt.ylabel("Liczba niedozwolonych elementów")
     plt.title('"Niedozwoloność" rozwiązania')
     plt.show()
+    plt.plot(statistics[0], statistics[3])
+    plt.xlabel("Liczba iteracji")
+    plt.ylabel("Używana pamięć [b]")
+    plt.title('Zużycie pamięci')
+    plt.show()
+
+
