@@ -1,4 +1,4 @@
-from Assumptions import Assumptions
+import Assumptions
 from copy import deepcopy
 from Worker import Worker
 from typing import List
@@ -6,12 +6,9 @@ import random
 
 
 class Scheduler:
-    def __init__(self, workers: List[Worker] = None):
-        self.workers = None
-        if workers is None:
-            self.default_workers()
-        else:
-            self.custom_workers(workers)
+    def __init__(self, workers: List[Worker]):
+        self.workers = workers
+        self.prepare_schedule()
 
     def __str__(self):
         string = ""
@@ -45,23 +42,9 @@ class Scheduler:
             not_worse = self.how_bad_am_i() <= other.how_bad_am_i()
             return True if not_worse or (sum(self.workers[0].schedule) < sum(other.workers[0].schedule) and not_worse) else False
 
-    def default_workers(self):
-        acceptable_shifts = Assumptions.default_acceptable_shifts
-        self.workers = [Worker(Assumptions.starting_cost + i*Assumptions.cost_increase, acceptable_shifts) for i in range(Assumptions.n_workers)]
+    def prepare_schedule(self):
         shifts_assigned = 0
         n_workers_available = Assumptions.n_workers
-        for week in range(Assumptions.n_weeks):
-            for i in range(len(Assumptions.n_required_shifts)):
-                j = Assumptions.n_required_shifts[i]
-                while j > 0:
-                    self.workers[shifts_assigned % n_workers_available].schedule[week*3*7 + i] = True
-                    shifts_assigned += 1
-                    j -= 1
-
-    def custom_workers(self, workers: List[Worker]):
-        self.workers = workers
-        shifts_assigned = 0
-        n_workers_available = len(self.workers)
         for week in range(Assumptions.n_weeks):
             for i in range(len(Assumptions.n_required_shifts)):
                 j = Assumptions.n_required_shifts[i]
@@ -94,52 +77,6 @@ class Scheduler:
             self.workers[w2].schedule, self.workers[w1].schedule = \
                 collapsed_shifts, [0] * len(collapsed_shifts)
 
-    # def get_neighbours(self):
-    #     neighbours = set()
-    #     # Swapping workers
-    #     for i in range(len(self.workers)):
-    #         for j in range(i+1, len(self.workers)):
-    #             neighbour = deepcopy(self)
-    #             neighbour.swap_workers(i, j)
-    #             neighbours.add(neighbour)
-    #     # Swapping shifts
-    #     for i in range(len(self.workers)):
-    #         for j in range(len(self.workers[i].schedule)):
-    #             if self.workers[i].schedule[j]:
-    #                 for k in range(len(self.workers)):
-    #                     neighbour = deepcopy(self)
-    #                     neighbour.swap_shifts(i, k, j)
-    #                     neighbours.add(neighbour)
-    #     # Collapsing shifts
-    #     for i in range(len(self.workers)):
-    #         for k in range(len(self.workers)):
-    #             neighbour = deepcopy(self)
-    #             neighbour.collapse_workers(i, k)
-    #             neighbours.add(neighbour)
-    #     return neighbours
-
-    # def get_neighbours(self):
-    #     neighbours = set()
-    #     # Swapping workers
-    #     i = 0
-    #     for j in range(i+1, len(self.workers)):
-    #         neighbour = deepcopy(self)
-    #         neighbour.swap_workers(i, j)
-    #         neighbours.add(neighbour)
-    #     # Swapping shifts
-    #     for j in range(len(self.workers[i].schedule)):
-    #         if self.workers[i].schedule[j]:
-    #             for k in range(len(self.workers)):
-    #                 neighbour = deepcopy(self)
-    #                 neighbour.swap_shifts(i, k, j)
-    #                 neighbours.add(neighbour)
-    #     # Collapsing shifts
-    #     for k in range(len(self.workers)):
-    #         neighbour = deepcopy(self)
-    #         neighbour.collapse_workers(i, k)
-    #         neighbours.add(neighbour)
-    #     return neighbours
-
     def get_neighbours(self, i: int):
         neighbours = set()
         i = 0
@@ -156,11 +93,10 @@ class Scheduler:
                     neighbour = deepcopy(self)
                     neighbour.swap_shifts(i, k, j)
                     neighbours.add(neighbour)
-        return neighbours
-
-    def get_sorted_neighbourhood(self):
-        neighbours = list(self.get_neighbours())
-        neighbours.sort(key=lambda neighbour: neighbour.get_total_cost())
+        for k in range(len(self.workers)):
+            neighbour = deepcopy(self)
+            neighbour.collapse_workers(i, k)
+            neighbours.add(neighbour)
         return neighbours
 
     def is_allowed(self):
@@ -168,7 +104,7 @@ class Scheduler:
 
     def set_working_first(self, should_i_sort: bool):
         if should_i_sort:
-            self.workers.sort(key=lambda w: w.get_cost() if w.is_working() and w.how_bad_am_i() == 0 else (1000000 if w.how_bad_am_i() > 0 else -1), reverse=True)
+            self.workers.sort(key=lambda w: w.get_cost() if w.is_working() and w.how_bad_am_i() == 0 else (1e30 if w.how_bad_am_i() > 0 else -1), reverse=True)
         i = 1
         while not self.workers[0].is_working():
             self.workers[0], self.workers[i] = self.workers[i], self.workers[0]
@@ -176,8 +112,3 @@ class Scheduler:
 
     def randomize_me(self):
         self.workers.sort(key=lambda w: random.randint(0, 10000) % 132 + random.randint(0, 10000) % 32 - 15)
-
-# scheduler = Scheduler()
-# scheduler.workers.append(Worker(3000, Assumptions.default_acceptable_shifts))
-# for worker in scheduler.workers:
-#     print(worker.cost)
