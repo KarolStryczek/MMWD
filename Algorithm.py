@@ -11,8 +11,7 @@ def my_tabu_search(first_solution, iters, tabu_list_size=30):
     best_candidate = first_solution
     tabu_list = list()
     tabu_list.append(first_solution)
-    # [i, cost, badness]
-    stats = [list(), list(), list()]
+    stats = [list(), list(), list()]  # [i, cost, badness]
     for i in range(iters):
         if i % 10 == 0:
             print(best)
@@ -42,7 +41,7 @@ def my_tabu_search(first_solution, iters, tabu_list_size=30):
 
 if __name__ == '__main__':
     # Algorithm
-    first_solution = Scheduler(WorkersFactory.get_workers("gauss"))
+    first_solution = Scheduler(WorkersFactory.get_workers("equal"))
     start = time.time()
     best_solution, best_good, statistics = my_tabu_search(first_solution, Assumptions.n_iters, Assumptions.tabu_size)
     end = time.time()

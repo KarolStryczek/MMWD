@@ -5,16 +5,16 @@ s = (
 
 n_workers = 30
 default_cost = 2000
-n_required_shifts = s[1]  # Whole week
-n_iters = 20
+gauss_avg = 3000
+gauss_sd = 500
+n_required_shifts = s[0]  # Whole week
+n_iters = 500
 tabu_size = 20
-n_weeks = 4
+n_weeks = 3
+percent_acceptable_shifts = 50
+
 how_often_organize = 10
 how_often_sort = 20
 shift_penalty = 1
 week_penalty = 2
-default_acceptable_shifts = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-percent_acceptable_shifts = 50
-gauss_avg = 3000
-gauss_sd = 500
 reward_for_badness = 0.05
